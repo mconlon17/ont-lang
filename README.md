@@ -1,22 +1,49 @@
 # Ont-lang
 
-Hacking around to provide a simple means for adding text in languages to ontologies.
+Provide a simple means for adding text in various languages to ontologies.
 
-## Command line process
-Perhaps there are three steps:
+## Four step process
 
-1. Extract the existing assertions from an existing ontology.  For each class and property, extract the assertions that contain text.  Provide the assertions in two languages, the reference langiage (often english) and the target language (any other language).  The result is a CSV file
-1. Edit the CSV file to add/correct text in the target language.
-1. Update the ontology with the assertions regarding the target language.
+1. Extract the existing assertions from an existing ontology.  For each class and 
+property, 
+extract the assertions that contain text.  Provide the assertions in two languages, 
+the reference langiage (often english) and the target language (any other language).  
+The result is a TSV file
+1. Edit the TSV file to add/correct text in the target language.
+1. Create a set of assertions that can be merged into the existing ontology
 
-### Tools used 
+## Tools used 
 
-python, SPARQL, robot.
+python, SPARQL, robot
 
-## On-line process
+## Usage Example
 
-An on-line process would need to *stop* at creating the assertions, and possibly open a pull request against the ontology for review.  Seems unlikley that an on-line process would be authorized to make changes to an ontology.
+In the steps below we add text for french to the language ontology
 
-### Tools used
+### Step 1 -- extract english and french from the language ontology
 
-Javascript, SPARQL, robot, Google Docs API
+    python3 get-text.py en fr lang.owl
+    
+`get-text.py` produces a TSV file `translate-en-fr.tsv`
+
+### Step 2 -- provide additional language text
+
+A translator edits `translate-en-fr.tsv` to provide additional language text for french.
+The translator can add as many or as few translations as they wish, or improve
+existing translations.
+
+### Step 3 -- create language assertions
+
+    python3 put-text.py translate-en-fr.tsv fr.owl
+    
+The file edited by the translator is used as input to `put-text.py`  
+
+### Step 4 -- merge the new assertions into the ontology
+
+The resulting  file `fr.owl` can be merged to the language ontology.  This can be 
+accomplished using robot as shown below:
+
+    robot merge --input lang.owl --input fr.owl --output new-lang.owl
+    
+The resulting ontology file `new-lang.owl` contains the translations provided by the
+translator.
